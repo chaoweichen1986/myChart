@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+  </head>
+  <body>
+    <canvas id="myCanvas" width="800" height="600" style="border:1px solid #000000;">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
+  </body>
+  <script>
+    var jsonString = '{"title":"大標題","lengthX":200,"lengthY":100,"intervalChart":20,"axisX":{"title":"X軸標題","data":[1850,1851,1852,1853,1854,1855,1856,1857,1858,1859],"boundaryValue":{"min":0,"max":0}},"chart":[{"title":"圖表標題","axisY":{"title":"Y軸標題","data":[[0.08016,0.08014,0.08018,0.08043,0.09623,0.0835,0.08332,0.08968,0.08196,0.08087],[0.08016,0.08014,0.08018,0.08043,0.080505,0.080525,0.080615,0.0807875,0.0808925,0.08087]],"boundaryValue":{"min":0,"max":0}},"line":[{"position":[{"x":0,"y":0}]}]},{"title":"圖表標題","axisY":{"title":"Y軸標題","data":[[287.1153,287.3275,287.3598,287.2551,287.0378,287.2133,287.276,287.1097,287.1465,287.2554],[287.0934,287.2404,287.2823,287.1155,287.1754,287.3071,287.1332,287.1254,287.283,287.4004]],"boundaryValue":{"min":0,"max":0}},"line":[{"position":[{"x":0,"y":0}]}]}]}';
+    var myChart = JSON.parse ( jsonString );  //圖表資料
+    //var intervalC = 20; //間隔
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
+    initChart(myChart);
+    drawChart();
+
+    //初始化
+    function initChart(myChart){
+      //設定X軸最大最小值
+      myChart.axisX.boundaryValue.max=Math.max(...myChart.axisX.data);
+      myChart.axisX.boundaryValue.min=Math.min(...myChart.axisX.data);
+      console.log("Xmax:"+myChart.axisX.boundaryValue.max);
+      console.log("Xmin:"+myChart.axisX.boundaryValue.min);
+      //設定Y軸最大最小值
+      for(var key in myChart.chart){   //圖表
+        /*for(var keyAxisY in myChart.chart[key].axisY.data){ //折線
+          myChart.chart[key].axisY.boundaryValue.max=Math.max(...myChart.chart[key].axisY.data[keyAxisY]);
+          myChart.chart[key].axisY.boundaryValue.min=Math.min(...myChart.chart[key].axisY.data[keyAxisY]);
+        }*/
+        myChart.chart[key].axisY.boundaryValue.max=Math.max(...myChart.chart[key].axisY.data);
+        myChart.chart[key].axisY.boundaryValue.min=Math.min(...myChart.chart[key].axisY.data);
+        console.log("chart"+key+"Ymax"+keyAxisY+":"+myChart.chart[key].axisY.boundaryValue.max);
+        console.log("chart"+key+"Ymin"+keyAxisY+":"+myChart.chart[key].axisY.boundaryValue.min);
+      }
+    }
+
+    //畫圖表
+    function drawChart(){
+      var origin={"x": myChart.interval,"y": myChart.interval};
+
+      for(var key in myChart.chart){
+        //畫軸線
+        ctx.moveTo(origin.x,origin.y);
+        ctx.lineTo(origin.x,origin.y+myChart.lengthY);
+        ctx.lineTo(origin.x+myChart.lengthX,origin.y+myChart.lengthY);
+        ctx.stroke();
+
+        origin.y+=myChart.lengthY;  //螢幕原點=>折線圖原點
+        drawLine(origin,myChart.chart[key]); //畫折線
+        origin.y+=myChart.interval;  //原點加上間距=>下個圖表的螢幕原點
+      }
+    }
+
+    //畫折線
+    function drawLine(origin,data){
+      var bv1=Math.round(500/(1852-1850));
+      var bv2=[Math.round(200/0.3),Math.round(200/(289.2-286))];
+      /*console.log(bv1);
+      console.log(bv2[0]);
+      console.log(bv2[1]);*/
+      ctx.moveTo(origin.x,origin.y);
+      for(var key in data){
+        console.log("key"+key);
+        for(var i in data[key]){
+          console.log("i"+i);
+          if(i!=0){
+            ctx.lineTo(origin.x+(data[key][0]-1850)*bv1,origin.y-(data[key][i]-286)*bv2[i]);
+            console.log(origin.x+(data[key][0]-1850)*bv1);
+            console.log(origin.y-(data[key][i]-286)*bv2[i]);
+            /*console.log(data[key][0]);
+            console.log(data[key][1]);
+            console.log(data[key][2]);*/
+          }
+        }console.log(" ");
+      }
+      ctx.stroke();
+    }
+
+    //找出邊界值
+    function getBoundaryValue(){
+      /*var BoundaryValue={"a": 0,"b": 0,"c": 0}
+      for(var key in data){
+        if(key==0){
+        }
+        else {
+        }
+      }*/
+    }
+  </script>
+</html>
